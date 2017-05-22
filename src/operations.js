@@ -61,7 +61,9 @@ module.exports = function(options,client){
             delete ret._id;
             ret = utils.ApplyMappings(ret, options.mappings);
             ret = utils.ApplyDefaults(ret, options.defaults);
-            return utils.ApplySelector(ret,options.selector);
+            ret = utils.ApplySelector(ret,options.selector);
+            ret = utils.ApplyInflator(ret,options.inflator);
+            return ret;
           }
         }),context._id,(err,content) => {
           if(err) return console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error'),' -> ',err);
@@ -81,6 +83,7 @@ module.exports = function(options,client){
             ret = utils.ApplyMappings(ret, options.mappings);
             ret = utils.ApplyDefaults(ret, options.defaults);
             ret = utils.ApplySelector(ret,options.selector);
+            ret = utils.ApplyInflator(ret,options.inflator);
 
             ret.objectID = doc._id;
 

@@ -49,6 +49,14 @@ function ApplyDefaults(doc, defaults) {
   return doc;
 }
 
+function ApplyInflator(doc, inflator) {
+    if(!inflator) return doc;
+
+    inflator(doc);
+
+    return doc;
+}
+
 function ApplySelector(doc,selector) {
   if(!selector) return doc;
 

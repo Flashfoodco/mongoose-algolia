@@ -59,6 +59,7 @@ module.exports = function(options,client){
                   ret = utils.ApplyMappings(ret, options.mappings);
                   ret = utils.ApplyDefaults(ret, options.defaults);
                   ret = utils.ApplySelector(ret,options.selector);
+                  ret = utils.ApplyInflator(ret,options.inflator);
 
                   ret.objectID = doc._id;
 
