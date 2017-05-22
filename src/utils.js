@@ -139,5 +139,6 @@ module.exports = {
   ApplyPopulation,
   ApplyDefaults,
   ApplyMappings,
-  GetRelevantKeys
+  GetRelevantKeys,
+  ApplyInflator
 }
