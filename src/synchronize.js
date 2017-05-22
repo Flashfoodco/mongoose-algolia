@@ -48,35 +48,76 @@ module.exports = function(options,client){
             }
             if(options.debug) console.log(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.greenBright('Cleared Index'),' -> ',currentIndexName);
 
+            var toDelete = [];
+            var toAdd = [];
+
             let objects = indicesMap[currentIndexName].map(obj => {
               return obj.toObject({
                 versionKey: false,
                 transform: function(doc,ret) {
                   if (doc.constructor.modelName !== obj.constructor.modelName) return ret;
 
-                  delete ret._id;
-                  delete ret.__v;
-                  ret = utils.ApplyMappings(ret, options.mappings);
-                  ret = utils.ApplyDefaults(ret, options.defaults);
-                  ret = utils.ApplySelector(ret,options.selector);
-                  ret = utils.ApplyInflator(ret,options.inflator);
+                    if(options.filter && !options.filter(doc)) {
+                        toDelete.push(doc._id);
+                    } else {
+                        delete ret._id;
+                        delete ret.__v;
+                        ret = utils.ApplyMappings(ret, options.mappings);
+                        ret = utils.ApplyDefaults(ret, options.defaults);
+                        ret = utils.ApplySelector(ret,options.selector);
+                        ret = utils.ApplyInflator(ret,options.inflator);
 
-                  ret.objectID = doc._id;
+                        ret.objectID = doc._id;
+
+                        toAdd.push(ret);
+                    }
 
                   return ret;
                 }
               });
             });
 
-            currentIndex.saveObjects(objects,(err, content) => {
-              if(err) {
+            var operationsCompleted = 0;
+            var complete = function() {
+                if (operationsCompleted >= 2) {
+                  return;
+                }
+
+                operationsCompleted += 1;
+                if (operationsCompleted >= 2) {
+                    if(options.debug) console.log(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.greenBright('Synchronized Index'),' -> ',currentIndexName);
+                    innerResolve();
+                }
+            };
+
+            var abort = function() {
                 innerReject(err);
                 return console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error'),' -> ',err);
-              }
+            };
 
-              if(options.debug) console.log(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.greenBright('Synchronized Index'),' -> ',currentIndexName);
-              innerResolve();
-            });
+            if (toDelete.length > 0) {
+                currentIndex.deleteObjects(toDelete, function(err, content) {
+                    if (err) {
+                        abort();
+                    } else {
+                        complete();
+                    }
+                });
+            } else {
+                complete();
+            }
+
+            if (toAdd.length > 0) {
+                currentIndex.saveObjects(toAdd,(err, content) => {
+                    if(err) {
+                        return abort();
+                    }
+
+                    complete();
+                });
+            } else {
+                complete();
+            }
           });
 
         });
