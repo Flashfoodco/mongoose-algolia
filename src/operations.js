@@ -6,7 +6,7 @@ const clc = require('cli-color');
 module.exports = function(options,client){
 
   this.pre('save',function(next) {
-
+      console.log("Item Pre Save Trigger");
     let isModified = false;
 
     let relevantKeys = utils.GetRelevantKeys(this.toJSON(), options.selector);
@@ -24,6 +24,7 @@ module.exports = function(options,client){
   });
 
   this.post('save',function() {
+      console.log("Item Post Save Trigger");
     let indices = utils.GetIndexName(this,options.indexName);
     if(indices instanceof Array) {
       indices.forEach(index => SyncItem(this, client.initIndex(index)));
@@ -33,6 +34,7 @@ module.exports = function(options,client){
   });
 
   this.post('remove',function(){
+      console.log("Item Remove Trigger");
     let indices = utils.GetIndexName(this,options.indexName);
     if(indices instanceof Array) {
       indices.forEach(index => RemoveItem(this, client.initIndex(index)));
