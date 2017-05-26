@@ -27,7 +27,8 @@ module.exports = exports = function algoliaIntegration(schema,opts) {
 
   const client = algolia(options.appId,options.apiKey);
 
-  require('./operations').call(schema,options,client);
+  var syncronizer = require('./synchronizer')(options,client);
+  require('./operations').call(schema,options,client,syncronizer);
 
   schema.statics.SyncToAlgolia = function(){
     return require('./synchronize').call(this,options,client);
