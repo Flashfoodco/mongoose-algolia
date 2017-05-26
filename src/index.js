@@ -15,6 +15,7 @@ module.exports = exports = function algoliaIntegration(schema,opts) {
     inflator: null,
     filter: null,
     populate: null,
+    dependency: null,
     debug: false
   }
 
@@ -30,13 +31,16 @@ module.exports = exports = function algoliaIntegration(schema,opts) {
   var syncronizer = require('./synchronizer')(options,client);
   require('./operations').call(schema,options,client,syncronizer);
 
-  schema.statics.SyncToAlgolia = function(){
-    return require('./synchronize').call(this,options,client);
+  if (!options.dependency) {
+      schema.statics.SyncToAlgolia = function(){
+          return require('./synchronize').call(this,options,client);
+      }
+
+      schema.statics.SetAlgoliaSettings = function(settings){
+          if(!settings) return console.error(clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error'),' -> Invalid settings');
+          return require('./settings').call(this,settings,options,client);
+      }
   }
 
-  schema.statics.SetAlgoliaSettings = function(settings){
-    if(!settings) return console.error(clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error'),' -> Invalid settings');
-    return require('./settings').call(this,settings,options,client);
-  }
 
 }
