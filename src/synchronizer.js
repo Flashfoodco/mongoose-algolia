@@ -23,7 +23,7 @@ module.exports = function(options,client){
                 transform: function(doc,ret) {
                     if (doc.constructor.modelName !== populated.constructor.modelName) return ret;
 
-                    delete ret._id;
+                    // delete ret._id;
                     ret = utils.ApplyMappings(ret, options.mappings);
                     ret = utils.ApplyDefaults(ret, options.defaults);
                     ret = utils.ApplySelector(ret,options.selector);
@@ -44,7 +44,7 @@ module.exports = function(options,client){
                 transform: function(doc,ret) {
                     if (doc.constructor.modelName !== populated.constructor.modelName) return ret;
 
-                    delete ret._id;
+                    // delete ret._id;
                     ret = utils.ApplyMappings(ret, options.mappings);
                     ret = utils.ApplyDefaults(ret, options.defaults);
                     ret = utils.ApplySelector(ret,options.selector);

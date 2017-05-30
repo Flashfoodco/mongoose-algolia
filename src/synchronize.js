@@ -59,7 +59,7 @@ module.exports = function(options,client){
                     if(options.filter && !options.filter(doc)) {
                         return ret;
                     } else {
-                        delete ret._id;
+                        // delete ret._id;
                         delete ret.__v;
                         ret = utils.ApplyMappings(ret, options.mappings);
                         ret = utils.ApplyDefaults(ret, options.defaults);
