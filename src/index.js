@@ -16,6 +16,7 @@ module.exports = exports = function algoliaIntegration(schema,opts) {
         filter: null,
         populate: null,
         dependency: null,
+        modelProvider: null,
         debug: false
     }
 

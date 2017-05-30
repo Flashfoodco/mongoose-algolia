@@ -55,6 +55,57 @@ module.exports = function(options,client, synchronizer){
         }
     });
 
+    this.post('update', function() {
+        var query = this;
+        let indices = utils.GetIndexName(this, options.indexName);
+        if (!options.dependency) {
+
+            if (options.modelProvider) {
+                var model = options.modelProvider();
+                if (!model) {
+                    return;
+                }
+                model.find(query.getQuery(), function(err, items){
+                    if (err) {
+                        console.error(err);
+                    } else {
+                        var syncItems = function(index, items) {
+                            items.forEach(item => {
+                                item.wasModified = true;
+                            synchronizer.SyncItem(item, client.initIndex(indices));
+
+                        });
+                        }
+
+                        if(indices instanceof Array) {
+                            indices.forEach(index => syncItems(index, items));
+                        }else{
+                            syncItems(indices, items)
+                        }
+                    }
+
+                });
+            }
+
+        } else {
+            if (options.modelProvider) {
+                var model = options.modelProvider();
+                if (!model) {
+                    return;
+                }
+                model.find(query.getQuery(), function(err, items){
+                    if (err) {
+                        console.error(err);
+                    } else {
+
+                        options.dependency.onDependenciesUpdated(items, OnDependentUpdated(indices));
+                    }
+                });
+            }
+
+        }
+    });
+
 
     function OnDependentUpdated(indices) {
 
