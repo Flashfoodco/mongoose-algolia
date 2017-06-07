@@ -7,6 +7,10 @@ module.exports = function(options,client){
 
     var synchronizer = {};
     synchronizer.RemoveItem = function(context, index) {
+        if (options.filterIgnore && !options.filter(context._doc, "remove")) {
+            return;
+        }
+
         index.deleteObject(context._id.toString(),err => {
             if(err) return console.error(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.red.bold('Error'),' -> ',err);
         if(options.debug) console.log(clc.blackBright(`[${new Date().toLocaleTimeString()}]`),clc.cyanBright('[Algolia-sync]'),' -> ',clc.greenBright('Deleted'),' -> ObjectId: ', context._id);
@@ -14,6 +18,10 @@ module.exports = function(options,client){
     }
 
     synchronizer.SyncItem = function(context, index){
+        if (options.filterIgnore && !options.filter(context._doc, "sync")) {
+            return;
+        }
+
         if(options.filter && !options.filter(context._doc)) {
             this.RemoveItem(context, index);
         }else if(context.wasNew) {
