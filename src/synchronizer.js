@@ -7,7 +7,7 @@ module.exports = function(options,client){
 
     var synchronizer = {};
     synchronizer.RemoveItem = function(context, index) {
-        if (options.filterIgnore && !options.filter(context._doc, "remove")) {
+        if (options.filterIgnore && options.filterIgnore(context, "remove")) {
             return;
         }
 
@@ -18,7 +18,7 @@ module.exports = function(options,client){
     }
 
     synchronizer.SyncItem = function(context, index){
-        if (options.filterIgnore && !options.filter(context._doc, "sync")) {
+        if (options.filterIgnore && options.filterIgnore(context, "sync")) {
             return;
         }
 

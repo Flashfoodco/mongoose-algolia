@@ -18,6 +18,7 @@ module.exports = function(options,client, synchronizer){
 
         this.wasNew = this.isNew;
         this.wasModified = isModified;
+        this.wasModifiedPaths = this.modifiedPaths();
         next();
     });
 
