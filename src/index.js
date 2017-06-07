@@ -2,6 +2,7 @@
 
 const algolia = require('algoliasearch');
 const clc = require('cli-color');
+const utils = require('./utils');
 
 module.exports = exports = function algoliaIntegration(schema,opts) {
 
@@ -36,6 +37,24 @@ module.exports = exports = function algoliaIntegration(schema,opts) {
     if (!options.dependency) {
         schema.statics.SyncToAlgolia = function(){
             return require('./synchronize').call(this,options,client);
+        }
+
+        schema.statics.SyncDocuments = function(items){
+            if (!items) {
+                return;
+            }
+
+            items.forEach(function (item) {
+
+                item.wasModified = true;
+
+                let indices = utils.GetIndexName(item, options.indexName);
+                if(indices instanceof Array) {
+                    indices.forEach(index => syncronizer.SyncItem(item, client.initIndex(index)));
+                }else{
+                    syncronizer.SyncItem(item, client.initIndex(indices));
+                }
+            });
         }
 
         schema.statics.SetAlgoliaSettings = function(settings){
